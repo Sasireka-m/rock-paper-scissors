@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors - Best of 5</title>
+    <style>
+        /* Default Light Mode Styles */
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            margin-top: 50px;
+            background-color: white;
+            color: black;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Dark Mode Styles */
+        .dark-mode {
+            background-color: #222;
+            color: white;
+        }
+
+        /* Game Buttons */
+        .choices { display: flex; justify-content: center; gap: 20px; margin-bottom: 20px; }
+        .choice { 
+            cursor: pointer; 
+            border: none; 
+            background: none; 
+            text-align: center; 
+            font-size: 40px;
+            transition: transform 0.3s;
+        }
+        .choice:hover { transform: scale(1.1); }
+
+        /* Text under emojis */
+        .choice span { 
+            display: block; 
+            font-size: 18px; 
+            font-weight: bold; 
+            margin-top: 5px; 
+            color: black; 
+            transition: color 0.3s;
+        }
+
+        /* Change text color in Dark Mode */
+        .dark-mode .choice span {
+            color: white;
+        }
+
+        /* Game Results & Scoreboard */
+        #result { margin-top: 20px; font-size: 20px; font-weight: bold; }
+        .scoreboard { margin-top: 20px; font-size: 18px; }
+
+        /* Player & Computer Choice Display */
+        .display-choices { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 50px; 
+            margin-top: 30px; 
+            font-size: 40px; 
+            font-weight: bold; 
+        }
+
+        /* Dark Mode Toggle Button */
+        .dark-mode-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: black;
+            color: white;
+            transition: 0.3s;
+        }
+        .dark-mode-btn:hover {
+            background-color: #444;
+        }
+
+        /* Restart Button */
+        .restart-btn {
+            display: none;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: red;
+            color: white;
+            transition: 0.3s;
+        }
+        .restart-btn:hover {
+            background-color: darkred;
+        }
+
+        /* Animation for choices */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <h1>Rock Paper Scissors - Best of 5</h1>
+
+    <!-- Dark Mode Toggle Button -->
+    <button class="dark-mode-btn" onclick="toggleDarkMode()">🌙 Toggle Dark Mode</button>
+
+    <div class="choices">
+        <button class="choice" onclick="playGame('Rock')">
+            ✊
+            <span>Rock</span>
+        </button>
+        <button class="choice" onclick="playGame('Paper')">
+            ✋
+            <span>Paper</span>
+        </button>
+        <button class="choice" onclick="playGame('Scissors')">
+            ✂️
+            <span>Scissors</span>
+        </button>
+    </div>
+
+    <!-- Player & Computer Choices -->
+    <div class="display-choices">
+        <div>
+            <p>You: <span id="playerChoice">❓</span></p>
+        </div>
+        <div>
+            <p>Computer: <span id="computerChoice">❓</span></p>
+        </div>
+    </div>
+
+    <p id="result"></p>
+
+    <div class="scoreboard">
+        <p>Player Score: <span id="playerScore">0</span></p>
+        <p>Computer Score: <span id="computerScore">0</span></p>
+    </div>
+
+    <!-- Restart Button -->
+    <button class="restart-btn" onclick="restartGame()">🔄 Restart Game</button>
+
+    <script>
+        let playerScore = 0;
+        let computerScore = 0;
+        const maxScore = 3; // First to 3 wins
+
+        function playGame(playerChoice) {
+            if (playerScore >= maxScore || computerScore >= maxScore) {
+                return; // Stop game when someone reaches max score
+            }
+
+            const choices = ["Rock", "Paper", "Scissors"];
+            const computerChoice = choices[Math.floor(Math.random() * choices.length)];
+            let result = "";
+
+            // Get elements for player and computer choice
+            let playerChoiceEl = document.getElementById("playerChoice");
+            let computerChoiceEl = document.getElementById("computerChoice");
+
+            // Reset choice display before animation
+            playerChoiceEl.innerText = "❓";
+            computerChoiceEl.innerText = "❓";
+
+            // Add shake animation
+            playerChoiceEl.classList.add("shake");
+            computerChoiceEl.classList.add("shake");
+
+            setTimeout(() => {
+                playerChoiceEl.classList.remove("shake");
+                computerChoiceEl.classList.remove("shake");
+
+                // Set player and computer choice with corresponding emoji
+                let emojiMap = {
+                    "Rock": "✊",
+                    "Paper": "✋",
+                    "Scissors": "✂️"
+                };
+                
+                playerChoiceEl.innerText = emojiMap[playerChoice];
+                computerChoiceEl.innerText = emojiMap[computerChoice];
+
+                // Determine the result
+                if (playerChoice === computerChoice) {
+                    result = "It's a tie!";
+                } else if (
+                    (playerChoice === "Rock" && computerChoice === "Scissors") ||
+                    (playerChoice === "Paper" && computerChoice === "Rock") ||
+                    (playerChoice === "Scissors" && computerChoice === "Paper")
+                ) {
+                    result = `🎉 You win this round! ${playerChoice} beats ${computerChoice}`;
+                    playerScore++;
+                } else {
+                    result = `😢 You lose this round! ${computerChoice} beats ${playerChoice}`;
+                    computerScore++;
+                }
+
+                // Update results and scores
+                document.getElementById("result").innerText = result;
+                document.getElementById("playerScore").innerText = playerScore;
+                document.getElementById("computerScore").innerText = computerScore;
+
+                // Check if game is over
+                if (playerScore >= maxScore) {
+                    document.getElementById("result").innerText = "🏆 Congratulations! You won Best of 5!";
+                    document.querySelector(".restart-btn").style.display = "block";
+                } else if (computerScore >= maxScore) {
+                    document.getElementById("result").innerText = "😢 Game Over! Computer won Best of 5.";
+                    document.querySelector(".restart-btn").style.display = "block";
+                }
+            }, 500);
+        }
+
+        function restartGame() {
+            playerScore = 0;
+            computerScore = 0;
+            document.getElementById("playerScore").innerText = "0";
+            document.getElementById("computerScore").innerText = "0";
+            document.getElementById("result").innerText = "";
+            document.querySelector(".restart-btn").style.display = "none";
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark-mode");
+        }
+    </script>
+</body>
+</html>
